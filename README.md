@@ -4,7 +4,7 @@ The purpose of this repo is to offer examples of data engineering projects I hav
 
 
 1. Python
-    1. Shift Builder: this project leverages parquet file read speeds to build out 
+    1. **Shift Builder**: this project leverages parquet file read speeds to build out 
 an ETL process that calculates shift times for taxi drivers in the green and yellow markets and uploads aggregated metrics to a SQL datawarehouse. [Click here for the walkthrough](https://duckduckgo.com).
-2. R
-3. SQL
+2. [R](https://duckduckgo.com)
+3. [SQL](https://duckduckgo.com)
