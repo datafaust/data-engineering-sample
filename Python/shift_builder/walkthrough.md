@@ -26,9 +26,7 @@ SQL Server receives a lot of traffic and a SQL solution seemed more complex and 
 we had created a data pipeline that recorded each day of trip records as parquet files saved into a directory so we could perform rapid calculations that could be parellalized through iteration. 
 Below you can see what that looks like:  
 
-
-med pic
-shl pic
+![alt text](./assets/images/shift_builder/parquetFiles.PNG)
 
 With our initial data source pegged and our result identified below was the general workflow I produced to capture what we needed:
 
@@ -332,13 +330,57 @@ def load_to_sql(df, taxi_type, con):
 
 Often I see other data engineers and analysts setup a process that relies on one file that holds a lot of code with little documentation. I like to break down my projects and modularize them as 
 that makes them easier to work with and much more transferable. For that reason I organized my project as such; the structure map for reference is below:
+
+```
 -shift_builder
 --etl
 --->functions.py
 --->__init__.py
 --sql
 --->create_tables.sql
-main.py
+--main.py
+```
 
+`main.py` would run a combination fo the functions located in `functions.py` that were made globally available via the `init.py`. The only hard coded elements would be the data source directories.
 
 # Automating the process
+
+We have an on prem server that we use to launch all our programs. We create a batch file for the program and set the project in Task Scheduler; for this project, it was set to run once on the 15th of every month.\
+The final main.py that ran via the batch file looks like such:
+
+```
+#import all functions
+from etl import * 
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
+from sqlalchemy import create_engine
+import urllib
+import gc
+
+#database params
+server= *****
+driver= '{ODBC Driver 17 for SQL Server}'
+database= *****
+username= *****
+
+#initiate connection
+params = urllib.parse.quote_plus("Driver=" + driver +";Server=" + server +";DATABASE=" + database + ";Trusted_Connection=yes")
+engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params, fast_executemany=True)
+
+#main function
+def run_shifts(mnth, taxi_type, rest, con):
+    print('running shifts for the month of: ' + mnth)
+    #collect all the trips for the month 
+    trips = pull_month(mnth, taxi_type)
+    trips = calculate_shift(trips, taxi_type, rest)
+    trips = metrics_builder(trips, taxi_type)
+    load_to_sql(trips, taxi_type ,con)
+    del(trips)
+    gc.collect()
+
+#run function
+if __name__ == "__main__":
+    mnth = str(date.today())
+    mnth = str((datetime.strptime(mnth, '%Y-%m-%d') + relativedelta(months=-1)).date())
+    run_shifts(mnth, 'shl', 3, engine)
+```
