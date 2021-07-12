@@ -26,7 +26,7 @@ SQL Server receives a lot of traffic and a SQL solution seemed more complex and 
 we had created a data pipeline that recorded each day of trip records as parquet files saved into a directory so we could perform rapid calculations that could be parellalized through iteration. 
 Below you can see what that looks like:  
 
-![alt text](./assets/images/shift_builder/parquetFiles.PNG)
+![alt text](./assets/images/parquetFiles.PNG)
 
 With our initial data source pegged and our result identified below was the general workflow I produced to capture what we needed:
 
