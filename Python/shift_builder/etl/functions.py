@@ -35,6 +35,11 @@ def pull_month(mnth, taxi_type):
     print(stop)
     
     #generate sequence of dates and extract directory files
+    #define data paths
+    paths ={
+        'med':'I:/COF/COF/_M3trics2/records/med_parquet',
+        'shl':'I:/COF/COF/_M3trics2/records/shl_parquet'
+    }
     my_days = pd.date_range(start=start,end=stop)
     filez = pull_range(paths[taxi_type], start, stop)
     
