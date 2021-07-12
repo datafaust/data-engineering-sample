@@ -50,6 +50,9 @@ def pull_month(mnth, taxi_type):
         
         #alter trip time into hours for shift calculations
         df['trip_time_hours'] = df['trip_time_secs']/3600
+        
+        #drop trip time since I don't need it anymore
+        df.drop('trip_time_secs', inplace=True, axis=1)
 
         
         trips.append(df)

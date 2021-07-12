@@ -4,7 +4,7 @@
 
 It was always believed that Yellow and Green Taxis operate within a shift model,
 that is drivers work 7-12 hour shifts, passing vehicles they lease to their partners after their shift ends.
-We the TLC do not collect data that accurately tracks this work arrangement. We do not know when a shift starts or ends. 
+Our organization does not collect data that accurately tracks this work arrangement. We do not know when a shift starts or ends. 
 I was tasked with the objective of using our existing trip data to impute shift start and end times. I was also required to build pertinent metrics around these new
 definitions and track them over the best time interval I could identify. I chose to look at shifts over the course of a month as I believe this allows for overlap during weeks and 
 was manageable given my computer specs.
@@ -24,19 +24,21 @@ This would essentially demarcate a shift; this ultimately ended up being 4 hours
 A task like this for us would be completed with SQL, R, Python or a combination of the sort. In our case I chose to primarily use a pythonic solution. The reason for this is that our
 SQL Server receives a lot of traffic and a SQL solution seemed more complex and computationally difficult. In addition, my team and I already had an alternative data source solution;
 we had created a data pipeline that recorded each day of trip records as parquet files saved into a directory so we could perform rapid calculations that could be parellalized through iteration. 
-Below you can see what that looks like:  
+Below you can see what that looks like (tpep is a short hand we use to refer to yellow taxis):  
 
-![alt text](./assets/images/parquetFiles.PNG)
+Solarized dark             |  Solarized Ocean
+:-------------------------:|:-------------------------:
+![alt text](./assets/images/parquetFiles.PNG)  |  ![alt text](./assets/images/parquetFilesShl.PNG) 
 
 With our initial data source pegged and our result identified below was the general workflow I produced to capture what we needed:
 
 1. Read a month of trip data
     1. bind the month together
     2. clean it up
-2. calculate the shift
+2. Calculate the shift
     1. order the trips
     2. calculate breaks
-    3. demarcate the beginning of breaks greater than n
+    3. demarcate the beginning of breaks greater than 4 hours
     4. build a unique id associated with every shift for a driver and their vehicle
 3. Build metrics
     1. build metrics grouped by month, year and the unique shift
