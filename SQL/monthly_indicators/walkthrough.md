@@ -4,7 +4,7 @@
 # Purpose
 
 When I arrived at my organization I was tasked with building out a [public facing report](https://www1.nyc.gov/assets/tlc/downloads/csv/data_reports_monthly.csv) that we would publish once a month
-capturing a myriad of trip record metrics meant to help journalists, independent researchers and the industry understand global trends in the taxi world.
+capturing a myriad of trip record metrics meant to help journalists, independent researchers and the industry, understand global trends in the taxi world.
 As I had started to build out a datawarehouse in server space I had procured this seemed an apt opportunity to produce an automated report using a SQL stored procedure. In this review I go over the production of the more
 complex portion of the entire dataset build. 
 
@@ -48,13 +48,13 @@ rm(fhv)
 
 ```
 
-The table was created with the a primary key for Month_Year and License_Class; for reference as this was a legacy data set that had to conform to older standards of reporting,
+The table was created with the a primary key for `Month_Year` and `License_Class`; for reference as this was a legacy data set that had to conform to older standards of reporting,
 `Month_Year` was displayed as `yyyy-mm` and License_Class types were `High Volume`, `Black Car`, `Lux Limo`, `Livery`. These represent various different industry sectors we monitor.
 
 # SQL - CTE process
 
-I elected to use a CTE process to set up the query. I was working with a total of three tables. One table hosted our High Volume trip records which pertained to all app ride-sharing companies
-like UBER and LYFT. Another table held what we deem as traditional for hire vehicle records -- these are lux limo companies, black car companies and liveries which operate under different rules than the app companies.
+I elected to use a CTE process to set up the query. I believe CTEs are better because they make SQL more readable and use less memory. I was working with a total of three tables. One table hosted our High Volume trip records which pertained to all app ride-sharing companies
+like UBER and LYFT. Another table held what we call traditional for hire vehicle records -- these are lux limo companies, black car companies and liveries which operate under different rules than the app companies.
 The final table was a list of bases which would be associated with different traditional vehicle types and help me classify the different industry sectors. I broke down the query
 into a staging section and a production section. Below is the staging section:
 
@@ -63,7 +63,6 @@ into a staging section and a production section. Below is the staging section:
 --------------------------------------------------------------------VARIABLES
 DECLARE @start as int;
 DECLARE @end as int;
-DECLARE @row_count as int;
 
 -------------LOOKBACK IS 3 MONTHS
 -------INDEXED FIELD IS datetimeid which looks like 2019010100; this is equal to '2019-01-01' 12:00
@@ -160,8 +159,7 @@ SELECT
 ``` 
 
 Data here was pulled on all the relevant metrics that were part of the spec. I utilized a field we call `datetimeid` as my primary way of dealing with dates, the reason being that this field
-was indexed and therefore the best field to run operations on; for reference the datetimeid field captures day and hour, so the following are equivalent: `2019-01-01 12:22:00 == 2019010112`.   
-Once the staging portion was written out I put together the final versions of the tables:
+was indexed and therefore the best field to run operations on; for reference the datetimeid field captures day and hour, so the following are equivalent: `2019-01-01 12:22:00 == 2019010112`. Once the staging portion was written out I put together the final versions of the tables:
 
 ```
 ...
@@ -219,7 +217,7 @@ for shared rides that I would join in this step but I have since optimized that 
 # Update procedure
 
 The final piece was to update the created table. We receive data typically on a biweekly basis and I find it best to run programs once a week with a wide lookback so we can capture any resubmissions
-and/or any other mistakes. For that reason I used SQL Server's `MERGE` functionality which runs and update and insert in one shot:
+and/or any other mistakes. For that reason I used SQL Server's `MERGE` functionality which runs an update and insert in one shot:
 
 ```
 ------------------------------------------------UPDATE TABLE 
@@ -255,6 +253,10 @@ WHEN NOT MATCHED
 
 END
 ```
+
+The final table it updates looks something like this:
+
+
 
 # Stored procedure
 
@@ -457,7 +459,6 @@ WHEN NOT MATCHED
 
 END
 ```
-
-
+This produces one of three final tables which get wrapped up into a final table in another stored procedure; but that's for another time. 
 
 
