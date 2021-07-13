@@ -26,7 +26,7 @@ SQL Server receives a lot of traffic and a SQL solution seemed more complex and 
 we had created a data pipeline that recorded each day of trip records as parquet files saved into a directory so we could perform rapid calculations that could be parellalized through iteration. 
 Below you can see what that looks like (tpep is a short hand we use to refer to yellow taxis):  
 
-Solarized dark             |  Solarized Ocean
+Yellow Taxi Trips             |  Green Taxi Trips
 :-------------------------:|:-------------------------:
 ![alt text](./assets/images/parquetFiles.PNG)  |  ![alt text](./assets/images/parquetFilesShl.PNG) 
 
