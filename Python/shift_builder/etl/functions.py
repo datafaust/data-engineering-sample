@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 import gc
 
-
+#matches parquet files in a directory for defined range with yyyy-mm-dd 
 def pull_range(dir,start, stop):
      start_date_time = dt.datetime.strptime(start, '%Y-%m-%d')
      stop_date_time = dt.datetime.strptime(stop, '%Y-%m-%d')
@@ -21,7 +21,8 @@ def pull_range(dir,start, stop):
                 <= stop_date_time)
             ]
 
-def pull_month(mnth, taxi_type):
+#concatenate an entire month of trips and bind them
+def pull_month(mnth, taxi_type, dirs):
     
     #define columns
     cols = ["hack",taxi_type,"pudt","dodt","fare","surcharge"
@@ -31,22 +32,17 @@ def pull_month(mnth, taxi_type):
     #produce start and end
     start = mnth
     stop = str(dt.datetime.strptime(mnth, '%Y-%m-%d') + relativedelta(months=+1) + dt.timedelta(days=-1))[0:10]
-    print(start)
-    print(stop)
+    #print(start)
+    #print(stop)
     
-    #generate sequence of dates and extract directory files
-    #define data paths
-    paths ={
-        'med':'I:/COF/COF/_M3trics2/records/med_parquet',
-        'shl':'I:/COF/COF/_M3trics2/records/shl_parquet'
-    }
+    #extract parquet files that match range
     my_days = pd.date_range(start=start,end=stop)
-    filez = pull_range(paths[taxi_type], start, stop)
+    filez = pull_range(dirs[taxi_type], start, stop)
     
-    #loop through the files, read and bind them
+    #loop through the files, read and bind them - some clean up in this step
     trips=[]
     for file in filez:
-        df = pd.read_parquet(file, engine='pyarrow')
+        df = pd.read_parquet(file, engine='pyarrow')#[1:100000]
         
         #alter trip time into hours for shift calculations
         df['trip_time_hours'] = df['trip_time_secs']/3600
@@ -62,8 +58,8 @@ def pull_month(mnth, taxi_type):
     #bind to one data frame
     trips= pd.concat(trips, axis=0, ignore_index=True)
     
-    #keep trips that are shorter than or equal to 4 hours as these are considered valid
-    trips = trips[trips["trip_time_hours"] <= 4]
+    #keep trips that are shorter than or equal to 6 hours as these are considered valid
+    trips = trips.loc[trips.trip_time_hours <= 6]
     
     #clean any leakage in trips that might have been coded wrong by DBA
     trips = trips.loc[trips.pudt >= start]
@@ -76,7 +72,7 @@ def pull_month(mnth, taxi_type):
     
     return trips
 
-
+#calculate a shift - this entails looking for breaks of 4 hours or more between trips for the same driver and vehicle
 def calculate_shift(df, taxi_type, rest):
     
     start_time = time.time()
@@ -115,7 +111,7 @@ def calculate_shift(df, taxi_type, rest):
     
     return(df)
 
-
+#perform hour calculations for shifts etc.
 def time_calculations(df, group_by):
 
     
@@ -140,6 +136,7 @@ def time_calculations(df, group_by):
      
      return df
 
+#build out pertinent metrics
 def metrics_builder(df, taxi_type):
     
     start_time = time.time()
@@ -191,6 +188,13 @@ def metrics_builder(df, taxi_type):
     
     return df
 
+#cache files to a directory of your choosing as a backup
+def cache_metrics(mnth, df, taxi_type, dirs):
+    direc = taxi_type + '_cache'
+    os.chdir(dirs[direc])
+    df.to_parquet('shift_metrics_'+ mnth[0:7] + '-01'  +'.parquet')
+    print('wrote out ' + mnth[0:7] + '-01' + ' metrics to dir: ' + direc)
+    
 
 #load to sql 
 def load_to_sql(df, taxi_type, con):

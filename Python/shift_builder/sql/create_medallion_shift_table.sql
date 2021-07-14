@@ -1,6 +1,6 @@
 ----FINAL MEDALLION TABLE
-DROP TABLE IF EXISTS medallion_monthly_shift_metrics;
-CREATE TABLE  medallion_monthly_shift_metrics
+DROP TABLE IF EXISTS med_monthly_shift_metrics;
+CREATE TABLE  med_monthly_shift_metrics
 (
 hack    varchar(20),
 med     varchar(20), 
