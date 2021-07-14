@@ -1,4 +1,4 @@
-# A data pipeline to calculate and track taxi shifts
+# A Data Pipeline to Calculate and Track Taxi Shifts
 
 # Purpose
 
@@ -404,7 +404,7 @@ Often I see other data engineers and analysts setup a process that relies on one
 --requirements.txt
 ```
 
-`main.py` runs a combination fo the functions located in `functions.py` that are made globally available via the `__init__.py`. The only hard coded elements are the data source directories.
+`main.py` runs a combination for the functions located in `functions.py` that are made globally available via the `__init__.py`. The only hard coded elements are the data source directories.
 
 # Automating the process
 
