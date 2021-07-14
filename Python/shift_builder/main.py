@@ -42,17 +42,17 @@ def run_shifts(mnth, taxi_type, rest, con, dirs):
     #calculate shifts
     trips = calculate_shift(trips, taxi_type, rest)
     #build out metrics
-    trips = metrics_builder(trips, taxi_type)
+    #trips = metrics_builder(trips, taxi_type)
     #cache metrics
-    cache_metrics(mnth, trips, taxi_type, dirs)
+    #cache_metrics(mnth, trips, taxi_type, dirs)
     #load to db
-    load_to_sql(trips, taxi_type ,con)
+    #load_to_sql(trips, taxi_type ,con)
     #clean up
-    del(trips)
+    #del(trips)
     gc.collect()
     te = str(time.time() - start_time)
     print('month shifts processed in ' + te + ' seconds.')
-    #return trips
+    return trips
 
 #run function
 if __name__ == "__main__":
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     #mnth = str(date.today())
     #mnth = str((datetime.strptime(mnth, '%Y-%m-%d') + relativedelta(months=-1)).date())
     
-    #public_cols = ["hack",taxi_type,"shift_status","shift_id","pudt","dodt"]
+    public_cols = ["hack",taxi_type,"pudt","dodt","break_from_last","shift_status","shift_id"]
     
-    trips = run_shifts(mnth, taxi_type, rest, engine, paths)#[0:50000][public_cols]
+    trips = run_shifts(mnth, taxi_type, rest, engine, paths)[0:50000][public_cols]
