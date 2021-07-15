@@ -31,7 +31,7 @@ def pull_month(mnth, taxi_type, dirs):
     
     #produce start and end
     start = mnth
-    stop = str(dt.datetime.strptime(mnth, '%Y-%m-%d') + relativedelta(months=+1) + dt.timedelta(days=-1))[0:10]
+    stop = str(dt.datetime.strptime(mnth, '%Y-%m-%d') + relativedelta(months=+1) + dt.timedelta(days=-1))#[0:10]
     #print(start)
     #print(stop)
     
